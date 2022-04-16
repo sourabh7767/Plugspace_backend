@@ -1,0 +1,1 @@
+<p id="content">{!! $message_body !!}</p>
