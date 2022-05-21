@@ -21,3 +21,9 @@
         <p>&nbsp;Rank Text</p>
     </a>
 </li>
+<li class="nav-item">                                                                                                                
+    <a href="{{ url('admin/listMessage') }}" class="nav-link {{ Request::is('admin/listMessage*') ? 'active' : '' }}">
+        <i class="fas  fa-envelope" aria-hidden="true"></i>
+        <p>&nbsp;Messages</p>
+    </a>
+</li>

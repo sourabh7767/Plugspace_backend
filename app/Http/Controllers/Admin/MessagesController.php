@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\SampleMessage;
+use Flash;
 
 class MessagesController extends Controller
 {
@@ -16,7 +17,10 @@ class MessagesController extends Controller
     
     public function addMessage(Request $request)
     {
-        SampleMessage::create(['message'=>$request['message']]);
+        $obj = new SampleMessage();
+        $obj->message = $request->text;
+        $obj->save();
+        //SampleMessage::create(['message'=>$request->text]);
         Flash::success('Message create successfully.');
 
         return  redirect('admin/listMessage');

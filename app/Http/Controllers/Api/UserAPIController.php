@@ -21,6 +21,7 @@ use App\Http\Controllers\CommonController;
 use App\Models\PlugspaceUser;
 use DateTime;
 use stdClass;
+use Log;
 
 class UserAPIController extends AppBaseController
 {
@@ -157,7 +158,7 @@ class UserAPIController extends AppBaseController
 
     public function verifyOTP(Request $request){
         try {
-
+            
             extract($request->all());
 
             $key = $request->header('key');
@@ -253,6 +254,8 @@ class UserAPIController extends AppBaseController
 
     public function signUp(Request $request)
     {
+        $input = $request->all();
+        Log::info($input);
         try {
             extract($request->all());
             //$profile=$_FILES['profile']['name'];
@@ -383,6 +386,7 @@ class UserAPIController extends AppBaseController
             if(!empty($checkExistUser)){
                 $user_id = $checkExistUser->user_id;
             }else{
+                //fkjghkfg
                 $insert = [
                     'name' => $name,
                     'ccode' => $ccode,
@@ -749,7 +753,7 @@ class UserAPIController extends AppBaseController
                     return AppBaseController::responseError(0, trans('words.invalid_user_id'));
                 }else {
 
-                    if($phone == '' && $ccode == ''){
+                    /*if($phone == '' && $ccode == ''){
                         $phone = '';
                         $ccode = '';
                     }
@@ -760,7 +764,7 @@ class UserAPIController extends AppBaseController
                         return AppBaseController::responseError(4, $checkExistUser->phone .trans('words.is_instagram_user'));
                     }elseif (!empty($checkExistUser)) {
                         return AppBaseController::responseError(0, trans('words.already_register'));
-                    }
+                    }*/
 
 
                      if (isset($remove_media_id) && $remove_media_id != "") {
@@ -806,7 +810,7 @@ class UserAPIController extends AppBaseController
                     }
 
                     $upddata=[
-                                'phone' => $phone,
+                               // 'phone' => $phone,
                                 'gender' => $gender,
                                 'rank' => $rank ?? '',
                                 'is_geo_location' => $is_geo_location,

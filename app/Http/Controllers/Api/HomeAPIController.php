@@ -80,22 +80,25 @@ class HomeAPIController extends AppBaseController
                 return AppBaseController::responseError(5, trans('words.account_deactive'));
             }
 
-            $likeDtl = Likes_Master::where('user_id', $user_id)->where('like_id', 274)->pluck('like_user_id')->toArray();
+            $likeDtl = Likes_Master::where('user_id', $user_id)->pluck('like_user_id')->toArray();
             //TODO: if match than remove from $likeDTL, if request not accepted than remove for 3 weeks
+
             $newLikeDtl = [];
             foreach($likeDtl as $likeUserId){
                 $checkMatch = Likes_Master::where('user_id', $likeUserId)->where('like_user_id', $user_id)->first();
                 if(!empty($checkMatch)){
-                    $newLikeDtl[] = $likeUserId;
+                    $newLikeDtl[$likeUserId] = $likeUserId;
                 }else{
+                    
                     $checkRequestSent = Likes_Master::where('user_id', $user_id)->where('like_user_id', $likeUserId)->first();
                     $updateDate = date('Y-m-d H:i:s', strtotime($checkRequestSent->updated_at.'+21 days'));
                     $currentDate = date('Y-m-d H:i:s');
-                    if($updateDate < $currentDate){
-                        $newLikeDtl[] = $likeUserId;
+                    if($updateDate > $currentDate){
+                        $newLikeDtl[$likeUserId] = $likeUserId;
                     }
                 }
             }
+            //echo "<pre>";print_r($newLikeDtl);die;
             $userDtl = User_Master::where('user_id', '!=', $user_id)->whereNotIn('user_id', $newLikeDtl)->get();
 
             $ageRange = explode('-',$chkUserExist->age_range_marriage);
@@ -113,10 +116,10 @@ class HomeAPIController extends AppBaseController
                     }
             }  
 
-            $userDtls = User_Master::inRandomOrder()->where('user_id', '!=', $user_id)->whereNotIn('user_id', $ageRanges)->limit(1)->get();
+            $userDtls = User_Master::inRandomOrder()->where('user_id', '!=', $user_id)->whereNotIn('user_id', $newLikeDtl)->whereNotIn('user_id', $ageRanges)->limit(1)->get();
 
             if(isset($search_text) && $search_text != '') {
-                $userDtls = User_Master::inRandomOrder()->where('name', 'LIKE', '%' . $search_text . '%')->where('user_id', '!=', $user_id)->limit(1)->get();
+                $userDtls = User_Master::inRandomOrder()->whereNotIn('user_id', $newLikeDtl)->where('name', 'LIKE', '%' . $search_text . '%')->where('user_id', '!=', $user_id)->limit(1)->get();
             }
             foreach ($userDtls as $user) {
                 $user['about_you'] = (string)json_decode($user->about_you);
@@ -190,6 +193,8 @@ class HomeAPIController extends AppBaseController
             })->select(['story_master.*', DB::Raw("Case when vs.user_id = '" . $user_id . "' then 1 else 0 end  as story_view_count")])->where('story_master.user_id', '!=', $user_id)->orderBy('story_view_count', 'asc')->orderBy('smm.created_at', 'desc')->groupBy('smm.story_id')->get();
             foreach ($storyDtl as $value) {
 //                unset($value->story_view_count);
+                $mediaDetail = Story_Media_Master::where('story_id', $value->story_id)->get();
+                $value['media'] = $mediaDetail;                
                 $userDtl = User_Master::where('user_id', $value->user_id)->first();
                 $mediaUserDtl = User_Media_Master::where('user_id', $value->user_id)->first();
 
@@ -212,6 +217,8 @@ class HomeAPIController extends AppBaseController
             $getStoryDtl = [];
             $getOwnstoryDtl = Story_Master::orderBy('story_id', 'DESC')->where('user_id', $user_id)->first();
             if (!empty($getOwnstoryDtl)) {
+                $mediaDetail = Story_Media_Master::where('story_id', $getOwnstoryDtl->story_id)->get();
+                $getStoryDtl[0]['media'] = $mediaDetail;                
                 $userDtl = User_Master::where('user_id', $getOwnstoryDtl->user_id)->first();
                 $mediaUserDtl = User_Media_Master::where('user_id', $getOwnstoryDtl->user_id)->first();
 

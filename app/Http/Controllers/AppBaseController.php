@@ -218,7 +218,12 @@ class AppBaseController extends Controller
             );
 
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, env('FIREBASE_URL') . "/CHATTING/" . $user_id . "_".$chat_user_id."/.json");
+            if($user_id < $chat_user_id){
+                curl_setopt($ch, CURLOPT_URL, env('FIREBASE_URL') . "/CHATTING/" . $user_id . "_".$chat_user_id."/.json");
+            }else{
+                curl_setopt($ch, CURLOPT_URL, env('FIREBASE_URL') . "/CHATTING/" . $chat_user_id . "_".$user_id."/.json");
+            }
+            
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
             $headers = array('Content-Type:application/json');

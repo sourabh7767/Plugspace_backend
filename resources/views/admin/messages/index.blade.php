@@ -8,7 +8,7 @@
                 <div class="col-sm-6">
                     <h1>Sample Messages</h1>
                 </div>
-                <div class="col-md-6" style="display: none;">
+                <div class="col-md-6" >
                     <button class="btn btn-primary float-right" data-toggle="modal" data-target="#categoryModal">Add Sample Message</button>
                 </div>
             </div>
@@ -16,7 +16,7 @@
     </section>
     <div class="content px-3">
 
-        
+        @include('flash::message')
         <div id="result"></div>  
         <div class="clearfix"></div>
 
